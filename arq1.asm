@@ -123,139 +123,157 @@ endm
      ; Leer un número de dos digitos, posible negativo
      ; ------------------------------------------------
 readNum proc
-                  mov               tempNum, 0
-                  mov               signo, 0
+                        mov               signo, 0
                  
-                  mov               bufferNum1, 0
-                  mov               bufferNum2, 0
+                        mov               bufferNum1, 0
+                        mov               bufferNum2, 0
 
-                  mov               ah, 07h
-                  int               21h
-                  cmp               al, '-'            ; Si es negativo
-                  je                readNumNeg
+                        mov               ah, 07h
+                        int               21h
+                        cmp               al, '-'                ; Si es negativo
+                        je                readNumNeg
 
-                  cmp               al, '0'
-                  jb                readNumErr
-                  cmp               al, '9'
-                  ja                readNumErr
-                  jmp               readNumFirst
+                        cmp               al, '0'
+                        jb                readNumErr
+                        cmp               al, '9'
+                        ja                readNumErr
+                        jmp               readNumFirst
 
-     readNumProc: 
-                  mov               ah, 07h
-                  int               21h
+     readNumProc:       
+                        mov               ah, 07h
+                        int               21h
      
-                  cmp               al, '0'
-                  jb                readNumErr
-                  cmp               al, '9'
-                  ja                readNumErr
-     readNumFirst:
-                  convertAsciiToNum al
-                  mov               bufferNum1, dl
-                  printAsciiFromNum bufferNum1
+                        cmp               al, '0'
+                        jb                readNumErr
+                        cmp               al, '9'
+                        ja                readNumErr
+     readNumFirst:      
+                        convertAsciiToNum al
+                        mov               bufferNum1, dl
+                        printAsciiFromNum bufferNum1
 
-                  mov               ah, 07h
-                  int               21h
+                        mov               ah, 07h
+                        int               21h
                  
-                  cmp               al, '0'
-                  jb                readNumErr
-                  cmp               al, '9'
-                  ja                readNumErr
-                  convertAsciiToNum al
-                  mov               bufferNum2, dl
-                  printAsciiFromNum bufferNum2
+                        cmp               al, '0'
+                        jb                readNumErr
+                        cmp               al, '9'
+                        ja                readNumErr
+                        convertAsciiToNum al
+                        mov               bufferNum2, dl
+                        printAsciiFromNum bufferNum2
                   
-                  jmp               readNumEnd
-     readNumNeg:  
-                  printAscii        '-'
-                  mov               signo, 1
-                  jmp               readNumProc
-     readNumErr:  
-                  printMsg          error
+                        jmp               readNumEnd
+     readNumNeg:        
+                        printAscii        '-'
+                        mov               signo, 1
+                        jmp               readNumProc
+     readNumErr:        
+                        printMsg          error
                  
-     readNumEnd:  
-                  printAscii        13
-                  printAscii        10
-                  ret
+     readNumEnd:        
+                        printAscii        13
+                        printAscii        10
+                        ret
 
 readNum endp
+
+saveNumToBuffer proc
+                        mov               tempNum, 0
+                        mov               al, 10
+                        mul               bufferNum1
+                        add               al, bufferNum2
+                        mov               tempNum, al
+                        cmp               signo, 1
+                        je                saveNumToBufferNeg
+                        ret
+     saveNumToBufferNeg:
+                        neg               tempNum
+                        ret
+
+
+
+saveNumToBuffer endp
 
      ; ------------------------------------------------
      ; Main
      ; ------------------------------------------------
 main proc
-                  mov               ax, @data
-                  mov               ds, ax
+                        mov               ax, @data
+                        mov               ds, ax
      ;----------------
      ; Menu
      ;----------------
-     menu:        
-                  printMsg          menuMsg
+     menu:              
+                        printMsg          menuMsg
 
-                  mov               ah, 00h            ; Leer caracter
-                  int               16h
+                        mov               ah, 00h                ; Leer caracter
+                        int               16h
 
-                  cmp               al, 27             ; ESC
-                  je                opt5
+                        cmp               al, 27                 ; ESC
+                        je                opt5
 
-                  cmp               al, '1'
-                  je                opt1
+                        cmp               al, '1'
+                        je                opt1
 
-                  cmp               al, '2'
-                  je                opt2
+                        cmp               al, '2'
+                        je                opt2
     
-                  cmp               al, '3'
-                  je                opt3
+                        cmp               al, '3'
+                        je                opt3
 
-                  cmp               al, '4'
-                  je                opt4
+                        cmp               al, '4'
+                        je                opt4
 
-                  cmp               al, '5'
-                  je                opt5
+                        cmp               al, '5'
+                        je                opt5
 
-                  jmp               menu
+                        jmp               menu
 
      ;------------------------------------------------
      ; Salida
      ;------------------------------------------------
-     exit:        
-                  mov               ah, 4ch
-                  int               21h
+     exit:              
+                        mov               ah, 4ch
+                        int               21h
 
      ;------------------------------------------------
      ; Opcion 1 - Ingresar ecuacion
      ;------------------------------------------------
-     opt1:        
-                  printMsg          txt1
-                  call              readNum
-                  jmp               menu
+     opt1:              
+                        printMsg          txt1
+                        call              readNum
+                        call              saveNumToBuffer
+                        printAscii        tempNum
+                        jmp               menu
 
      ;------------------------------------------------
      ; Opcion 2 - Imprimir la funcion
      ;------------------------------------------------
-     opt2:        
-                  printMsg          txt2
-                  jmp               menu
+     opt2:              
+                        printMsg          txt2
+                        jmp               menu
 
      ;------------------------------------------------
      ; Opcion 3 - Imprimir derivada
      ;------------------------------------------------
-     opt3:        
-                  printMsg          txt3
-                  jmp               menu
+     opt3:              
+                        printMsg          txt3
+                        jmp               menu
 
      ;------------------------------------------------
      ; Opcion 4 - Imprimir integral
      ;------------------------------------------------
-     opt4:        
-                  printMsg          txt4
-                  jmp               menu
+     opt4:              
+                        printMsg          txt4
+                        jmp               menu
 
      ;------------------------------------------------
      ; Opcion 5 - Salir
      ;------------------------------------------------
-     opt5:        
-                  printMsg          txt5
-                  jmp               exit
+     opt5:              
+                        printMsg          txt5
+                        jmp               exit
 
 main endp
 end main
