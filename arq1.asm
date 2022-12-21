@@ -110,6 +110,15 @@ endm
      coefF        db ?
 
      ; ------------------------------------------------
+     ; Coeficientes derivada
+     ; ------------------------------------------------
+     coefADiff    db ?
+     coefBDiff    db ?
+     coefCDiff    db ?
+     coefDDiff    db ?
+     coefEDiff    db ?
+
+     ; ------------------------------------------------
      ; Variables temporales readNum
      ; ------------------------------------------------
      tempNum      db 0                                                ; Variable donde se guarda el número leído
@@ -231,7 +240,9 @@ writeNumToBuffer proc
 
 writeNumToBuffer endp
 
-
+     ; ------------------------------------------------
+     ; Imprime el numero almacenado en el buffer
+     ; ------------------------------------------------
 printNumFromBuffer proc
 
 
@@ -248,6 +259,44 @@ printNumFromBuffer proc
                            ret
 
 printNumFromBuffer endp
+
+     ; ------------------------------------------------
+     ; Calcular coeficientes de las derivadas
+     ; ------------------------------------------------
+calculateDiffCoefs proc
+                           mov               coefADiff, 0
+                           mov               coefBDiff, 0
+                           mov               coefCDiff, 0
+                           mov               coefDDiff, 0
+                           mov               coefEDiff, 0
+     
+                           mov               al, coefA
+                           mov               bl, 5
+                           mul               bl
+                           mov               coefADiff, al
+     
+                           mov               al, coefB
+                           mov               bl, 4
+                           mul               bl
+                           mov               coefBDiff, al
+     
+                           mov               al, coefC
+                           mov               bl, 3
+                           mul               bl
+                           mov               coefCDiff, al
+     
+                           mov               al, coefD
+                           mov               bl, 2
+                           mul               bl
+                           mov               coefDDiff, al
+     
+                           mov               al, coefE
+                           mov               bl, 1
+                           mul               bl
+                           mov               coefEDiff, al
+     
+                           ret
+calculateDiffCoefs endp
 
      ; ------------------------------------------------
      ; Main
@@ -346,33 +395,49 @@ main proc
                            mov               revertingNum, ah
                            call              writeNumToBuffer
                            call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '5'
 
                            mov               ah, coefB
                            mov               revertingNum, ah
                            call              writeNumToBuffer
                            call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '4'
 
 
                            mov               ah, coefC
                            mov               revertingNum, ah
                            call              writeNumToBuffer
                            call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '3'
 
 
                            mov               ah, coefD
                            mov               revertingNum, ah
                            call              writeNumToBuffer
                            call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '2'
 
                            mov               ah, coefE
                            mov               revertingNum, ah
                            call              writeNumToBuffer
                            call              printNumFromBuffer
+                           printAscii        'x'
+                           
 
                            mov               ah, coefF
                            mov               revertingNum, ah
                            call              writeNumToBuffer
                            call              printNumFromBuffer
+                           printAscii        13
+                           printAscii        10
 
                            jmp               menu
 
@@ -381,6 +446,49 @@ main proc
      ;------------------------------------------------
      opt3:                 
                            printMsg          txt3
+
+                           call              calculateDiffCoefs
+
+                           mov               ah, coefADiff
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '4'
+
+                           mov               ah, coefBDiff
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '3'
+
+                           mov               ah, coefCDiff
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '2'
+
+                           mov               ah, coefDDiff
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                              
+
+
+                           mov               ah, coefEDiff
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        13
+                           printAscii        10
+                                   
+
                            jmp               menu
 
      ;------------------------------------------------
