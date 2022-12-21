@@ -191,9 +191,9 @@ saveNumToBuffer proc
                         neg               tempNum
                         ret
 
-
-
 saveNumToBuffer endp
+
+
 
      ; ------------------------------------------------
      ; Main
@@ -242,9 +242,44 @@ main proc
      ;------------------------------------------------
      opt1:              
                         printMsg          txt1
+
+                        printMsg          txtCoefA
                         call              readNum
                         call              saveNumToBuffer
-                        printAscii        tempNum
+                        mov               ah, tempNum
+                        mov               coefA, ah
+
+
+                        printMsg          txtCoefB
+                        call              readNum
+                        call              saveNumToBuffer
+                        mov               ah, tempNum
+                        mov               coefB, ah
+
+                        printMsg          txtCoefC
+                        call              readNum
+                        call              saveNumToBuffer
+                        mov               ah, tempNum
+                        mov               coefC, ah
+
+                        printMsg          txtCoefD
+                        call              readNum
+                        call              saveNumToBuffer
+                        mov               ah, tempNum
+                        mov               coefD, ah
+
+                        printMsg          txtCoefE
+                        call              readNum
+                        call              saveNumToBuffer
+                        mov               ah, tempNum
+                        mov               coefE, ah
+
+                        printMsg          txtCoefF
+                        call              readNum
+                        call              saveNumToBuffer
+                        mov               ah, tempNum
+                        mov               coefF, ah
+
                         jmp               menu
 
      ;------------------------------------------------
