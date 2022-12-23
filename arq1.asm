@@ -63,6 +63,16 @@ printCoef macro coef
                call printNumFromBuffer
 endm
 
+; ------------------------------------------------
+; Guardar coeficiente derivada - word
+; ------------------------------------------------
+printCoefDiffWord macro coef
+                       mov  ax, coef
+                       mov  revertingNumDiff, ax
+                       call writeNumToBufferDiff
+                       call printNumFromBufferDiff
+endm
+
 .model small
 .stack 100h
 .data
@@ -577,42 +587,27 @@ main proc
                            
                                call              calculateDiffCoefs
 
-                               mov               ax, coefADiff
-                               mov               revertingNumDiff, ax
-                               call              writeNumToBufferDiff
-                               call              printNumFromBufferDiff
+                               printCoefDiffWord coefADiff
                                printAscii        'x'
                                printAscii        '^'
                                printAscii        '4'
 
-                               mov               ax, coefBDiff
-                               mov               revertingNumDiff, ax
-                               call              writeNumToBufferDiff
-                               call              printNumFromBufferDiff
+                               printCoefDiffWord coefBDiff
                                printAscii        'x'
                                printAscii        '^'
                                printAscii        '3'
-
-                               mov               ax, coefCDiff
-                               mov               revertingNumDiff, ax
-                               call              writeNumToBufferDiff
-                               call              printNumFromBufferDiff
+                               
+                               printCoefDiffWord coefCDiff
                                printAscii        'x'
                                printAscii        '^'
                                printAscii        '2'
 
-                               mov               ax, coefDDiff
-                               mov               revertingNumDiff, ax
-                               call              writeNumToBufferDiff
-                               call              printNumFromBufferDiff
+                               printCoefDiffWord coefDDiff
                                printAscii        'x'
                               
 
 
-                               mov               ax, coefEDiff
-                               mov               revertingNumDiff, ax
-                               call              writeNumToBufferDiff
-                               call              printNumFromBufferDiff
+                               printCoefDiffWord coefEDiff
                                printAscii        13
                                printAscii        10
                                    
