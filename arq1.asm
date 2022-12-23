@@ -454,43 +454,73 @@ calculateIntegCoefs proc
                                mov               ax, 0
                                mov               dx,0
                                mov               al, coefA
+
+                               cmp               coefA,0
+                               jge               calculateIntegCoefAPos
+                               not               ah
+     calculateIntegCoefAPos:   
                                mov               bl, 6
-                               div               bl
+                               idiv              bl
                                mov               coefAInteg, al
 
                                mov               ax, 0
                                mov               dx,0
                                mov               al, coefB
+
+                               cmp               coefB,0
+                               jge               calculateIntegCoefBPos
+                               not               ah
+     calculateIntegCoefBPos:   
                                mov               bl, 5
-                               div               bl
+                               idiv              bl
                                mov               coefBInteg, al
 
                                mov               ax, 0
                                mov               dx,0
                                mov               al, coefC
+                               
+                               cmp               coefC,0
+                               jge               calculateIntegCoefCPos
+                               not               ah
+     calculateIntegCoefCPos:   
                                mov               bl, 4
-                               div               bl
+                               idiv              bl
                                mov               coefCInteg, al
 
                                mov               ax, 0
                                mov               dx,0
                                mov               al, coefD
+
+                               cmp               coefD,0
+                               jge               calculateIntegCoefDPos
+                               not               ah
+     calculateIntegCoefDPos:   
                                mov               bl, 3
-                               div               bl
+                               idiv              bl
                                mov               coefDInteg, al
 
                                mov               ax, 0
                                mov               dx,0
                                mov               al, coefE
+
+                               cmp               coefE,0
+                               jge               calculateIntegCoefEPos
+                               not               ah
+     calculateIntegCoefEPos:   
                                mov               bl, 2
-                               div               bl
+                               idiv              bl
                                mov               coefEInteg, al
 
                                mov               ax, 0
                                mov               dx,0
                                mov               al, coefF
+
+                               cmp               coefF,0
+                               jge               calculateIntegCoefFPos
+                               not               ah
+     calculateIntegCoefFPos:   
                                mov               bl, 1
-                               div               bl
+                               idiv              bl
                                mov               coefFInteg, al
 
                                ret
