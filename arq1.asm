@@ -378,36 +378,61 @@ calculateDiffCoefs proc
                                mov               ax, 0
                                mov               dx, 0
                                mov               al, coefA
+                               
+                               cmp               coefA,0
+                               jge               calculateDiffCoefAPos
+                               not               ah
+     calculateDiffCoefAPos:    
                                mov               bx, 5
-                               mul               bx
+                               imul              bx
                                mov               coefADiff, ax
 
                                mov               ax, 0
                                mov               dx, 0
                                mov               al, coefB
+
+                               cmp               coefB,0
+                               jge               calculateDiffCoefBPos
+                               not               ah
+     calculateDiffCoefBPos:    
                                mov               bx, 4
-                               mul               bx
+                               imul              bx
                                mov               coefBDiff, ax
      
                                mov               ax, 0
                                mov               dx, 0
                                mov               al, coefC
+
+                               cmp               coefC,0
+                               jge               calculateDiffCoefCPos
+                               not               ah
+     calculateDiffCoefCPos:    
                                mov               bx, 3
-                               mul               bx
+                               imul              bx
                                mov               coefCDiff, ax
      
                                mov               ax, 0
                                mov               dx, 0
                                mov               al, coefD
+                               
+                               cmp               coefD,0
+                               jge               calculateDiffCoefDPos
+                               not               ah
+     calculateDiffCoefDPos:    
                                mov               bx, 2
-                               mul               bx
+                               imul              bx
                                mov               coefDDiff, ax
      
                                mov               ax, 0
                                mov               dx, 0
                                mov               al, coefE
+
+                               cmp               coefE,0
+                               jge               calculateDiffCoefEPos
+                               not               ah
+     calculateDiffCoefEPos:    
                                mov               bx, 1
-                               mul               bx
+                               imul              bx
                                mov               coefEDiff, ax
      
                                ret
