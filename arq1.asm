@@ -119,6 +119,16 @@ endm
      coefEDiff    db ?
 
      ; ------------------------------------------------
+     ; Coeficientes integral
+     ; ------------------------------------------------
+     coefAInteg   db ?
+     coefBInteg   db ?
+     coefCInteg   db ?
+     coefDInteg   db ?
+     coefEInteg   db ?
+     coefFInteg   db ?
+
+     ; ------------------------------------------------
      ; Variables temporales readNum
      ; ------------------------------------------------
      tempNum      db 0                                                ; Variable donde se guarda el número leído
@@ -299,6 +309,59 @@ calculateDiffCoefs proc
 calculateDiffCoefs endp
 
      ; ------------------------------------------------
+     ; Calcular coeficientes de las integrales
+     ; ------------------------------------------------
+
+calculateIntegCoefs proc
+
+                           mov               coefAInteg, 0
+                           mov               coefBInteg, 0
+                           mov               coefCInteg, 0
+                           mov               coefDInteg, 0
+                           mov               coefEInteg, 0
+                           mov               coefFInteg, 0
+
+                           mov               ax, 0
+                           mov               al, coefA
+                           mov               bl, 6
+                           div               bl
+                           mov               coefAInteg, al
+
+                           mov               ax, 0
+                           mov               al, coefB
+                           mov               bl, 5
+                           div               bl
+                           mov               coefBInteg, al
+
+                           mov               ax, 0
+                           mov               al, coefC
+                           mov               bl, 4
+                           div               bl
+                           mov               coefCInteg, al
+
+                           mov               ax, 0
+                           mov               al, coefD
+                           mov               bl, 3
+                           div               bl
+                           mov               coefDInteg, al
+
+                           mov               ax, 0
+                           mov               al, coefE
+                           mov               bl, 2
+                           div               bl
+                           mov               coefEInteg, al
+
+                           mov               ax, 0
+                           mov               al, coefF
+                           mov               bl, 1
+                           div               bl
+                           mov               coefFInteg, al
+
+                           ret
+
+calculateIntegCoefs endp
+
+     ; ------------------------------------------------
      ; Main
      ; ------------------------------------------------
 main proc
@@ -446,7 +509,7 @@ main proc
      ;------------------------------------------------
      opt3:                 
                            printMsg          txt3
-
+                           
                            call              calculateDiffCoefs
 
                            mov               ah, coefADiff
@@ -496,6 +559,62 @@ main proc
      ;------------------------------------------------
      opt4:                 
                            printMsg          txt4
+                           
+
+                           call              calculateIntegCoefs
+
+                           
+                           mov               ah, coefAInteg
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '6'
+
+                           mov               ah, coefBInteg
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '5'
+
+                           mov               ah, coefCInteg
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '4'
+
+                           mov               ah, coefDInteg
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '3'
+
+                           mov               ah, coefEInteg
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                           printAscii        '^'
+                           printAscii        '2'
+
+                           mov               ah, coefFInteg
+                           mov               revertingNum, ah
+                           call              writeNumToBuffer
+                           call              printNumFromBuffer
+                           printAscii        'x'
+                           
+                           printAscii        '+'
+                           printAscii        'C'
+                           printAscii        13
+                           printAscii        10
+
                            jmp               menu
 
      ;------------------------------------------------
