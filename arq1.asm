@@ -7,7 +7,6 @@ printMsg macro str
               mov ah, 09h            ; imprimir cadena
               mov dx, offset str     ; dx = offset de la cadena
               int 21h                ; imprimir cadena
-              
 endm
 
 ; ------------------------------------------------
@@ -20,7 +19,6 @@ printAsciiFromNum macro num
                        mov dl, num       ; dx = offset de la cadena
                        add dl, '0'
                        int 21h           ; imprimir cadena
-                       
 endm
 
 ; ------------------------------------------------
@@ -44,6 +42,26 @@ convertAsciiToNum macro ascii
 endm
 
 
+; ------------------------------------------------
+; Guardar coeficiente
+; ------------------------------------------------
+
+saveCoef macro coef
+              call readNum
+              call saveNumToBuffer
+              mov  ah, tempNum
+              mov  coef, ah
+endm
+
+; ------------------------------------------------
+; Imprimir coeficiente
+; ------------------------------------------------
+printCoef macro coef
+               mov  ah, coef
+               mov  revertingNum, ah
+               call writeNumToBuffer
+               call printNumFromBuffer
+endm
 
 .model small
 .stack 100h
@@ -410,41 +428,23 @@ main proc
                            printMsg          txt1
 
                            printMsg          txtCoefA
-                           call              readNum
-                           call              saveNumToBuffer
-                           mov               ah, tempNum
-                           mov               coefA, ah
+                           saveCoef          coefA
 
 
                            printMsg          txtCoefB
-                           call              readNum
-                           call              saveNumToBuffer
-                           mov               ah, tempNum
-                           mov               coefB, ah
+                           saveCoef          coefB
 
                            printMsg          txtCoefC
-                           call              readNum
-                           call              saveNumToBuffer
-                           mov               ah, tempNum
-                           mov               coefC, ah
+                           saveCoef          coefC
 
                            printMsg          txtCoefD
-                           call              readNum
-                           call              saveNumToBuffer
-                           mov               ah, tempNum
-                           mov               coefD, ah
+                           saveCoef          coefD
 
                            printMsg          txtCoefE
-                           call              readNum
-                           call              saveNumToBuffer
-                           mov               ah, tempNum
-                           mov               coefE, ah
+                           saveCoef          coefE
 
                            printMsg          txtCoefF
-                           call              readNum
-                           call              saveNumToBuffer
-                           mov               ah, tempNum
-                           mov               coefF, ah
+                           saveCoef          coefF
 
                            jmp               menu
 
@@ -454,51 +454,33 @@ main proc
      opt2:                 
                            printMsg          txt2
 
-                           mov               ah, coefA
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefA
                            printAscii        'x'
                            printAscii        '^'
                            printAscii        '5'
 
-                           mov               ah, coefB
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefB
                            printAscii        'x'
                            printAscii        '^'
                            printAscii        '4'
 
 
-                           mov               ah, coefC
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefC
                            printAscii        'x'
                            printAscii        '^'
                            printAscii        '3'
 
 
-                           mov               ah, coefD
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefD
                            printAscii        'x'
                            printAscii        '^'
                            printAscii        '2'
 
-                           mov               ah, coefE
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefE
                            printAscii        'x'
                            
 
-                           mov               ah, coefF
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefF
                            printAscii        13
                            printAscii        10
 
@@ -560,54 +542,34 @@ main proc
      opt4:                 
                            printMsg          txt4
                            
-
                            call              calculateIntegCoefs
-
                            
-                           mov               ah, coefAInteg
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefAInteg
                            printAscii        'x'
                            printAscii        '^'
                            printAscii        '6'
 
-                           mov               ah, coefBInteg
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefBInteg
                            printAscii        'x'
                            printAscii        '^'
                            printAscii        '5'
 
-                           mov               ah, coefCInteg
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefCInteg
                            printAscii        'x'
                            printAscii        '^'
                            printAscii        '4'
 
-                           mov               ah, coefDInteg
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefDInteg
                            printAscii        'x'
                            printAscii        '^'
                            printAscii        '3'
 
-                           mov               ah, coefEInteg
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefEInteg
                            printAscii        'x'
                            printAscii        '^'
                            printAscii        '2'
 
-                           mov               ah, coefFInteg
-                           mov               revertingNum, ah
-                           call              writeNumToBuffer
-                           call              printNumFromBuffer
+                           printCoef         coefFInteg
                            printAscii        'x'
                            
                            printAscii        '+'
