@@ -128,6 +128,11 @@ endm
      error            db 'Error', 10,13, '$'
 
      ; ------------------------------------------------
+     ; Mensaje de error - ecuacion no ingresada
+     ; ------------------------------------------------
+     noEcuacionMsg    db 'Error: Ecuacion no ingresada', 10,13, '$'
+
+     ; ------------------------------------------------
      ; Coeficientes
      ; ------------------------------------------------
      coefA            db ?
@@ -171,16 +176,21 @@ endm
 
 
      ; ------------------------------------------------
-     ;
+     ; Variables temporales writeNumDiff - 3 digitos
      ; ------------------------------------------------
      bufferNum1Diff   db 0                                                ; Buffer para guardar el número leído
      bufferNum2Diff   db 0                                                ; Buffer para guardar el número leído
      bufferNum3Diff   db 0                                                ; Buffer para guardar el número leído
 
      ; ------------------------------------------------
-     ;
+     ; Variable temporal revertNumDiff
      ; ------------------------------------------------
-     revertingNumDiff dw 0                                                ; Variable donde se guarda el número invertido
+     revertingNumDiff dw 0                                                ; Guarda el número invertido en 16 bits
+
+     ; ------------------------------------------------
+     ; Flag que almacenara el estado de la ecuacion
+     ; ------------------------------------------------
+     flagEcuacion     db 0                                                ; 0 = no ingresada, 1 = ingresada
      
 
 .code
@@ -570,6 +580,13 @@ main proc
                                int               21h
 
      ;------------------------------------------------
+     ; Ecuacion no ingresada
+     ;------------------------------------------------
+     noEcuacion:               
+                               printMsg          noEcuacionMsg
+                               jmp               menu
+
+     ;------------------------------------------------
      ; Opcion 1 - Ingresar ecuacion
      ;------------------------------------------------
      opt1:                     
@@ -594,6 +611,8 @@ main proc
                                printMsg          txtCoefF
                                saveCoef          coefF
 
+                               mov               flagEcuacion, 1
+
                                jmp               menu
 
      ;------------------------------------------------
@@ -601,6 +620,9 @@ main proc
      ;------------------------------------------------
      opt2:                     
                                printMsg          txt2
+
+                               cmp               flagEcuacion, 0
+                               je                noEcuacion
 
                                printCoef         coefA
                                printAscii        'x'
@@ -640,6 +662,9 @@ main proc
      opt3:                     
                                printMsg          txt3
                            
+                               cmp               flagEcuacion, 0
+                               je                noEcuacion
+
                                call              calculateDiffCoefs
 
                                printCoefDiffWord coefADiff
@@ -674,6 +699,9 @@ main proc
      ;------------------------------------------------
      opt4:                     
                                printMsg          txt4
+
+                               cmp               flagEcuacion, 0
+                               je                noEcuacion
                            
                                call              calculateIntegCoefs
                            
