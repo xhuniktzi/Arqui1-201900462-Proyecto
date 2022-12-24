@@ -1,5 +1,9 @@
 ; ------------------------------------------------
 ; Imprimir
+; esta macro se encarga de imprimir una cadena de caracteres en la pantalla. Para ello, primero carga la dirección de 
+; inicio de la sección de datos en el registro AX y luego la carga en el registro DS, lo que permite acceder a la 
+; memoria de la cadena. Luego, carga el carácter de impresión de cadena en el registro AH y la dirección de inicio de 
+; la cadena en el registro DX, y finalmente llama a la interrupción 21h para imprimir la cadena.
 ; ------------------------------------------------
 printMsg macro str
               mov ax, @data          ; ax = offset de la cadena
@@ -11,6 +15,10 @@ endm
 
 ; ------------------------------------------------
 ; Imprimir un numero
+; esta macro se encarga de imprimir un número en formato ASCII en la pantalla. Para ello, primero carga la dirección de 
+; inicio de la sección de datos en el registro AX y luego la carga en el registro DS, lo que permite acceder a la 
+; memoria de la cadena. Luego, carga el carácter de impresión de carácter en el registro AH y el número en formato 
+; ASCII en el registro DL, y finalmente llama a la interrupción 21h para imprimir el carácter.
 ; ------------------------------------------------
 printAsciiFromNum macro num
                        mov ax, @data     ; ax = offset de la cadena
@@ -23,6 +31,10 @@ endm
 
 ; ------------------------------------------------
 ; Imprimir un caracter ascii
+; esta macro se encarga de imprimir un carácter ASCII en la pantalla. Para ello, primero carga la dirección de inicio 
+; de la sección de datos en el registro AX y luego la carga en el registro DS, lo que permite acceder a la memoria de 
+; la cadena. Luego, carga el carácter de impresión de carácter en el registro AH y el carácter ASCII en el registro DL, 
+; y finalmente llama a la interrupción 21h para imprimir el carácter.
 ; ------------------------------------------------
 printAscii macro ascii
                 mov ax, @data     ; ax = offset de la cadena
@@ -35,6 +47,8 @@ endm
 
 ; ------------------------------------------------
 ; Convertir un caracter ascii a numero
+; esta macro se encarga de convertir un carácter ASCII en formato de número. Para ello, carga el carácter ASCII en el 
+; registro DL y luego resta el valor ASCII del carácter '0' para obtener el valor numérico equivalente.
 ; ------------------------------------------------
 convertAsciiToNum macro ascii
                        mov dl, ascii
@@ -44,8 +58,9 @@ endm
 
 ; ------------------------------------------------
 ; Guardar coeficiente
+; esta macro se encarga de leer un número del teclado y guardarlo en un buffer temporal. Luego, carga el número leído 
+; en el registro AH y lo guarda en la variable "tempNum".
 ; ------------------------------------------------
-
 saveCoef macro coef
               call readNum
               call saveNumToBuffer
@@ -55,6 +70,10 @@ endm
 
 ; ------------------------------------------------
 ; Imprimir coeficiente
+; Esta macro se encarga de imprimir un número guardado en la variable "coef". Primero, carga el número en el registro 
+; AH y lo guarda en la variable "revertingNum". Luego, llama a la función "writeNumToBuffer" para escribir el número en 
+; un buffer temporal. Finalmente, llama a la función "printNumFromBuffer" para imprimir el número desde el buffer ; 
+; temporal.
 ; ------------------------------------------------
 printCoef macro coef
                mov  ah, coef
@@ -65,6 +84,10 @@ endm
 
 ; ------------------------------------------------
 ; Guardar coeficiente derivada - word
+; esta macro es similar a la anterior, pero se utiliza para imprimir un número guardado en una variable de 16 bits 
+; (tipo "word") llamada "coefDiff". Primero, carga el número en el registro AX y lo guarda en la variable 
+; "revertingNumDiff". Luego, llama a la función "writeNumToBufferDiff" para escribir el número en un buffer temporal. 
+; Finalmente, llama a la función "printNumFromBufferDiff" para imprimir el número desde el buffer temporal.
 ; ------------------------------------------------
 printCoefDiffWord macro coef
                        mov  ax, coef
@@ -196,6 +219,16 @@ endm
 .code
      ; ------------------------------------------------
      ; Leer un número de dos digitos, posible negativo
+     ; esta función se encarga de leer un número de dos dígitos del teclado y almacenarlo en un buffer temporal.
+     ; Primero, inicializa las variables "signo", "bufferNum1" y "bufferNum2" a cero. Luego, llama a la interrupción
+     ; 21h con el carácter de lectura de carácter en el registro AH para leer el primer dígito del número. Si el
+     ; carácter leído es un signo negativo ('-'), salta a la etiqueta "readNumNeg", en caso contrario, verifica que el
+     ; carácter leído esté dentro del rango de dígitos ('0' a '9'). Si no es así, salta a la etiqueta "readNumErr" para
+     ; imprimir un mensaje de error y salir de la función. Si el carácter es válido, salta a la etiqueta "readNumProc"
+     ; para leer el segundo dígito del número. Luego, convierte el carácter leído a formato numérico y lo almacena en
+     ; "bufferNum1". Finalmente, imprime el número leído y vuelve a leer el segundo dígito del número. Si el segundo
+     ; dígito es válido, convierte el carácter leído a formato numérico y lo almacena en "bufferNum2", y finalmente
+     ; salta a la etiqueta "readNumEnd" para finalizar la función.
      ; ------------------------------------------------
 readNum proc
                                mov               signo, 0
@@ -255,6 +288,9 @@ readNum endp
 
      ; ------------------------------------------------
      ; Guardar el número leído en tempNum
+     ; esta función se encarga de almacenar el número leído en la variable "tempNum". Primero, inicializa "tempNum" a
+     ; cero. Luego, multiplica "bufferNum1" por 10 y suma "bufferNum2" para obtener el número final. Si el número es
+     ; negativo (indicado por la variable "signo"), se invierte el signo del número antes de almacenarlo en "tempNum".
      ; ------------------------------------------------
 saveNumToBuffer proc
                                mov               tempNum, 0
@@ -274,6 +310,11 @@ saveNumToBuffer endp
 
      ; ------------------------------------------------
      ; Escribe el numero en el buffer
+     ; Esta función se encarga de escribir un número en un buffer temporal. Primero, inicializa las variables
+     ; "bufferNum1", "bufferNum2" y "signo" a cero. Luego, verifica si el número es negativo y, en caso afirmativo,
+     ; salta a la etiqueta "writeNumToBufferNeg" para invertir el signo del número y establecer la variable "signo" a
+     ; 1. A continuación, divide el número por 10 y almacena el resto en "bufferNum1". Luego, divide el número entero
+     ; por 10 y almacena el resto en "bufferNum2". Finalmente, la función retorna.
      ; ------------------------------------------------
 writeNumToBuffer proc
                                mov               bufferNum1, 0
@@ -303,6 +344,9 @@ writeNumToBuffer endp
 
      ; ------------------------------------------------
      ; Imprime el numero almacenado en el buffer
+     ;  esta función se encarga de imprimir un número desde un buffer temporal. Primero, verifica si el número es
+     ; negativo y, en caso afirmativo, imprime el signo negativo. Luego, imprime el primer dígito del número y el
+     ; segundo dígito del número. Finalmente, imprime un salto de línea para avanzar al siguiente renglón.
      ; ------------------------------------------------
 printNumFromBuffer proc
 
@@ -323,6 +367,8 @@ printNumFromBuffer endp
 
      ; ------------------------------------------------
      ; Escribe el numero del buffer para derivadas
+     ; esta función es similar a "writeNumToBuffer", pero se utiliza para escribir un número de 16 bits (tipo "word")
+     ; en un buffer temporal.
      ; ------------------------------------------------
 writeNumToBufferDiff proc
                                mov               bufferNum1Diff,0
@@ -358,6 +404,8 @@ writeNumToBufferDiff endp
 
      ; -----------------------------------------------------------
      ; Escribe el numero almacenado en el buffer para derivadas
+     ; esta función es similar a "printNumFromBuffer", pero se utiliza para imprimir un número de 16 bits (tipo "word")
+     ; desde un buffer temporal.
      ; -----------------------------------------------------------
 printNumFromBufferDiff proc
                                cmp               signo, 1
@@ -377,6 +425,12 @@ printNumFromBufferDiff endp
 
      ; ------------------------------------------------
      ; Calcular coeficientes de las derivadas
+     ; esta función se encarga de calcular los coeficientes de las derivadas de un polinomio. Primero, inicializa las
+     ; variables "coefADiff", "coefBDiff", "coefCDiff", "coefDDiff" y "coefEDiff" a cero. Luego, para cada uno de los
+     ; coeficientes "coefA", "coefB", "coefC", "coefD" y "coefE" del polinomio, verifica si el coeficiente es negativo
+     ; y, en caso afirmativo, invierte el signo del coeficiente. A continuación, multiplica el coeficiente por el
+     ; exponente correspondiente y almacena el resultado en la variable de coeficiente de la derivada correspondiente.
+     ; Finalmente, la función retorna.
      ; ------------------------------------------------
 calculateDiffCoefs proc
                                mov               coefADiff, 0
@@ -450,6 +504,11 @@ calculateDiffCoefs endp
 
      ; ------------------------------------------------
      ; Calcular coeficientes de las integrales
+     ; esta función se encarga de calcular los coeficientes de las integrales de un polinomio. Primero, inicializa las
+     ; variables "coefAInteg", "coefBInteg", "coefCInteg", "coefDInteg", "coefEInteg" y "coefFInteg" a cero. Luego,
+     ; para cada uno de los coeficientes "coefA", "coefB", "coefC", "coefD", "coefE" y "coefF" del polinomio, divide el
+     ; coeficiente por el exponente correspondiente y almacena el resultado en la variable de coeficiente de la
+     ; integral correspondiente. Finalmente, la función retorna.
      ; ------------------------------------------------
 
 calculateIntegCoefs proc
@@ -576,6 +635,7 @@ main proc
      ; Salida
      ;------------------------------------------------
      exit:                     
+     ; Llamr a la rutina de salida
                                mov               ah, 4ch
                                int               21h
 
@@ -611,6 +671,7 @@ main proc
                                printMsg          txtCoefF
                                saveCoef          coefF
 
+     ; Marcar que la ecuacion fue ingresada
                                mov               flagEcuacion, 1
 
                                jmp               menu
@@ -621,6 +682,7 @@ main proc
      opt2:                     
                                printMsg          txt2
 
+     ; Verificar si la ecuacion fue ingresada
                                cmp               flagEcuacion, 0
                                je                noEcuacion
 
