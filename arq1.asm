@@ -108,7 +108,8 @@ endm
 '2. Imprimir funcion', 10,13,
 '3. Imprimir derivada', 10,13,
 '4. Imprimir integral', 10,13,
-'5. Salir', 10,13, '$'
+'5. Salir', 10,13,
+'6. Limpiar pantalla',10,13, '$'
 
      ;-----------------------------------------------------------------
      ; Texto de las opciones
@@ -344,7 +345,7 @@ writeNumToBuffer endp
 
      ; ------------------------------------------------
      ; Imprime el numero almacenado en el buffer
-     ;  esta función se encarga de imprimir un número desde un buffer temporal. Primero, verifica si el número es
+     ; esta función se encarga de imprimir un número desde un buffer temporal. Primero, verifica si el número es
      ; negativo y, en caso afirmativo, imprime el signo negativo. Luego, imprime el primer dígito del número y el
      ; segundo dígito del número. Finalmente, imprime un salto de línea para avanzar al siguiente renglón.
      ; ------------------------------------------------
@@ -629,6 +630,9 @@ main proc
                                cmp               al, '5'
                                je                opt5
 
+                               cmp               al, '6'
+                               je                opt6
+
                                jmp               menu
 
      ;------------------------------------------------
@@ -808,6 +812,25 @@ main proc
      opt5:                     
                                printMsg          txt5
                                jmp               exit
+
+     opt6:                     
+     ; Mover cursor a (0,0) y limpiar pantalla
+                               mov               ah, 02h                       ; Función 02h: Mover cursor
+                               mov               bh, 00h                       ; Número de la pantalla (0: pantalla principal)
+                               mov               dh, 00h                       ; Coordenada Y del cursor (fila)
+                               mov               dl, 00h                       ; Coordenada X del cursor (columna)
+                               int               10h                           ; Llamada al sistema de video
+
+     ; Limpiar pantalla a partir de la posición actual del cursor
+                               mov               ah, 06h                       ; Función 06h: Scroll de pantalla hacia arriba
+                               mov               al, 00h                       ; Número de líneas a borrar (0: todas las líneas)
+                               mov               bh, 07h                       ; Atributo de color (blanco sobre fondo negro)
+                               mov               ch, 00h                       ; Coordenada Y de inicio (fila)
+                               mov               cl, 00h                       ; Coordenada X de inicio (columna)
+                               mov               dh, 24h                       ; Coordenada Y de fin (fila)
+                               mov               dl, 79h                       ; Coordenada X de fin (columna)
+                               int               10h                           ; Llamada al sistema de video
+                               jmp               menu
 
 main endp
 end main
