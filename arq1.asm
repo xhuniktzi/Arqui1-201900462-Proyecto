@@ -109,7 +109,11 @@ endm
 '3. Imprimir derivada', 10,13,
 '4. Imprimir integral', 10,13,
 '5. Salir', 10,13,
-'6. Limpiar pantalla',10,13, '$'
+'6. Limpiar pantalla', 10,13,
+'7. Graficar funcion',10,13,
+'8. Metodo de Newton',10,13,
+'9. Metodo de Steffenson',10,13,
+'$'
 
      ;-----------------------------------------------------------------
      ; Texto de las opciones
