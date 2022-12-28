@@ -220,6 +220,13 @@ endm
      ; ------------------------------------------------
      flagEcuacion     db 0                                                ; 0 = no ingresada, 1 = ingresada
      
+     ; -----------------------------------------------------------------
+     ; Variables temporales para calcular potencias de resultado 16 bits
+     ; -----------------------------------------------------------------
+     potencia         dw 0                                                ; Variable donde se guarda la potencia
+     ; exponente        dw 0                                                ; Variable donde se guarda el exponente
+     ; base             dw 0                                                ; Variable donde se guarda la base
+
 
 .code
      ; ------------------------------------------------
@@ -602,6 +609,28 @@ calculateIntegCoefs proc
 calculateIntegCoefs endp
 
      ; ------------------------------------------------
+     ; Calcular potencia
+     ; ------------------------------------------------
+calculatePow proc
+     ;  Pasar como parámetros base y exponente en ax y bx respectivamente
+     ;  mov               ax, base
+     ;  mov               bx, exponente
+                               mov               potencia, 1
+
+     lp:                       
+                               cmp               bx, 0
+                               jle               endlp
+
+                               imul              ax
+                               dec               bx
+                               jmp               lp
+     endlp:                    
+                               mov               potencia, ax
+                               ret
+
+calculatePow endp
+
+     ; ------------------------------------------------
      ; drawPixel
      ; ------------------------------------------------
 drawPixel proc
@@ -620,7 +649,7 @@ drawXAxis proc
      drawXAxisLoop:            
                                inc               cx
                                call              drawPixel
-                               cmp               cx, 254
+                               cmp               cx, 255
                                jne               drawXAxisLoop
                                ret
 
@@ -636,11 +665,17 @@ drawYAxis proc
      drawYAxisLoop:            
                                inc               dx
                                call              drawPixel
-                               cmp               dx, 254
+                               cmp               dx, 255
                                jne               drawYAxisLoop
                                ret
 
 drawYAxis endp
+     ; ------------------------------------------------
+     ; Dibujar Función
+     ; ------------------------------------------------
+drawFunc proc
+     ; Dibujar desde x=-127 a x = 127
+drawFunc endp
 
      ; ------------------------------------------------
      ; Dibujar plano cartesiano
