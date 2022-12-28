@@ -602,6 +602,77 @@ calculateIntegCoefs proc
 calculateIntegCoefs endp
 
      ; ------------------------------------------------
+     ; drawPixel
+     ; ------------------------------------------------
+drawPixel proc
+                               mov               ah,0ch
+                               mov               al,12
+                               int               10h
+                               ret
+drawPixel endp
+     ; ------------------------------------------------
+     ; Dibjuar Eje X
+     ; ------------------------------------------------
+drawXAxis proc
+                               mov               dx, 127                       ; Set Coordenada Y
+                               mov               cx, 0                         ; Set Coordenada X
+
+     drawXAxisLoop:            
+                               inc               cx
+                               call              drawPixel
+                               cmp               cx, 254
+                               jne               drawXAxisLoop
+                               ret
+
+drawXAxis endp
+
+     ; ------------------------------------------------
+     ; Dibjuar Eje Y
+     ; ------------------------------------------------
+drawYAxis proc
+                               mov               dx, 0                         ; Set Coordenada Y
+                               mov               cx, 127                       ; Set Coordenada X
+
+     drawYAxisLoop:            
+                               inc               dx
+                               call              drawPixel
+                               cmp               dx, 254
+                               jne               drawYAxisLoop
+                               ret
+
+drawYAxis endp
+
+     ; ------------------------------------------------
+     ; Dibujar plano cartesiano
+     ; ------------------------------------------------
+displayCartesiano proc
+
+                               mov               ax,@data
+                               mov               ds,ax
+     
+     ; ---------------------------- Iniciar modo video ----------------------------
+                               mov               ah, 00h
+                               mov               al, 12h
+                               int               10h
+
+                               call              drawXAxis
+                               call              drawYAxis
+
+     ; ---------------------------- Esperar tecla ----------------------------
+                               mov               ah, 00h                       ; Leer caracter
+                               int               16h
+                               
+     ; ---------------------------- Finalizar modo video ----------------------------
+                               mov               ax, @data
+                               mov               ds, ax
+                               mov               ah, 0h
+                               mov               al, 07h
+                               int               10h
+                               ret
+displayCartesiano endp
+
+
+     ; ------------------------------------------------
      ; Main
      ; ------------------------------------------------
 main proc
@@ -636,6 +707,9 @@ main proc
 
                                cmp               al, '6'
                                je                opt6
+
+                               cmp               al,'7'
+                               je                opt7
 
                                jmp               menu
 
@@ -835,6 +909,13 @@ main proc
                                mov               dl, 79h                       ; Coordenada X de fin (columna)
                                int               10h                           ; Llamada al sistema de video
                                jmp               menu
+
+     opt7:                                                                     ; Cambia a modo de video gráfico
+                               call              displayCartesiano
+
+
+                               jmp               opt6
+     
 
 main endp
 end main
