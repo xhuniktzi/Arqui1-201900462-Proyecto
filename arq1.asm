@@ -221,8 +221,18 @@ endm
      flagEcuacion     db 0                                                ; 0 = no ingresada, 1 = ingresada
      
 
+     ; ------------------------------------------------
+     ; Potencia variables temporales
+     ; ------------------------------------------------
+     base             dw 0                                                ; Variable donde se guarda la base
+     exponente        dw 0                                                ; Variable donde se guarda el exponente
+     resultado        dw 0                                                ; Variable donde se guarda el resultado
 
-
+     ; ------------------------------------------------
+     ; Variables temporales para calculo de Y Pos
+     ; ------------------------------------------------
+     x                dw 0                                                ; Variable donde se guarda el valor de X
+     y                dw 0                                                ; Variable donde se guarda el valor de Y
 
 .code
      ; ------------------------------------------------
@@ -608,8 +618,9 @@ calculateIntegCoefs endp
      ; drawPixel
      ; ------------------------------------------------
 drawPixel proc
+     ; AL = color
                                mov               ah,0ch
-                               mov               al,12
+     ;  mov               al,12
                                int               10h
                                ret
 drawPixel endp
@@ -644,6 +655,140 @@ drawYAxis proc
                                ret
 
 drawYAxis endp
+
+     ; ------------------------------------------------
+     ; Calcular potencia de un numero entero de 16 bits
+     ; ------------------------------------------------
+powIntWord proc
+                               mov               resultado, 1
+
+     powIntWordLoop:           
+                               mov               ax, exponente
+                               cmp               ax, 0
+                               jle               powIntWordEnd
+
+                               mov               ax, base
+                               mul               resultado
+                               mov               resultado, ax
+
+                               dec               exponente
+                               jmp               powIntWordLoop
+     powIntWordEnd:            
+                               ret
+powIntWord endp
+
+
+     ; ------------------------------------------------
+     ; Calcular valor de la funcion
+     ; ------------------------------------------------
+calculateYPosFunction proc
+                               mov               bx, 0
+
+                               mov               exponente, 5
+                               mov               ax, x
+                               mov               base, ax
+                               call              powIntWord
+                               mov               ax, 0
+                               mov               al, coefA
+
+                               cmp               coefA, 0
+                               jge               calculateYPosFunctionPosA
+                               not               ah
+
+     calculateYPosFunctionPosA:
+
+                               imul              resultado
+                               add               bx, ax
+     ;  add               bx, cx
+
+                               mov               exponente, 4
+                               mov               ax, x
+                               mov               base, ax
+                               call              powIntWord
+                               mov               ax, 0
+                               mov               al, coefB
+
+                               cmp               coefB, 0
+                               jge               calculateYPosFunctionPosB
+                               not               ah
+
+     calculateYPosFunctionPosB:
+
+                               imul              resultado
+                               add               bx, ax
+     ;  add               bx, cx
+
+                               mov               exponente, 3
+                               mov               ax, x
+                               mov               base, ax
+                               call              powIntWord
+                               mov               ax, 0
+                               mov               al, coefC
+
+                               cmp               coefC, 0
+                               jge               calculateYPosFunctionPosC
+                               not               ah
+
+     calculateYPosFunctionPosC:
+
+                               imul              resultado
+                               add               bx, ax
+     ;  add               bx, cx
+
+                               mov               exponente, 2
+                               mov               ax, x
+                               mov               base, ax
+                               call              powIntWord
+                               mov               ax, 0
+                               mov               al, coefD
+
+                               cmp               coefD, 0
+                               jge               calculateYPosFunctionPosD
+                               not               ah
+
+     calculateYPosFunctionPosD:
+
+                               imul              resultado
+                               add               bx, ax
+     ;  add               bx, cx
+
+                               mov               exponente, 1
+                               mov               ax, x
+                               mov               base, ax
+                               call              powIntWord
+                               mov               ax, 0
+                               mov               al, coefE
+
+                               cmp               coefE, 0
+                               jge               calculateYPosFunctionPosE
+                               not               ah
+
+     calculateYPosFunctionPosE:
+
+                               imul              resultado
+                               add               bx, ax
+     ;  add               bx, cx
+
+                               mov               exponente, 0
+                               mov               ax, x
+                               mov               base, ax
+                               call              powIntWord
+                               mov               ax, 0
+                               mov               al, coefF
+
+                               cmp               coefF, 0
+                               jge               calculateYPosFunctionPosF
+                               not               ah
+
+     calculateYPosFunctionPosF:
+
+                               imul              resultado
+                               add               bx, ax
+     ;  add               bx, cx
+
+                               mov               y, bx
+                               ret
+calculateYPosFunction endp
 
      ; ------------------------------------------------
      ; Dibujar plano cartesiano
@@ -914,10 +1059,24 @@ main proc
                                jmp               menu
 
      opt7:                                                                     ; Cambia a modo de video gráfico
-                               call              displayCartesiano
 
 
-                               jmp               opt6
+     ;  call              displayCartesiano
+                               call              readNum
+                               call              saveNumToBuffer
+                              
+                               mov               ax, 0
+                               mov               al, tempNum
+                               mov               x, ax
+                               
+                               call              calculateYPosFunction
+
+                               mov               ax, y
+                               mov               revertingNumDiff, ax
+                               call              writeNumToBufferDiff
+                               call              printNumFromBufferDiff
+
+                               jmp               menu
      
 
 main endp
