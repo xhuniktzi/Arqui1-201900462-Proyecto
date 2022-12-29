@@ -668,7 +668,7 @@ powIntWord proc
                                jle               powIntWordEnd
 
                                mov               ax, base
-                               mul               resultado
+                               imul              resultado
                                mov               resultado, ax
 
                                dec               exponente
@@ -1066,6 +1066,12 @@ main proc
                                call              saveNumToBuffer
                               
                                mov               ax, 0
+
+                               cmp               tempNum, 0
+                               jge               positive
+                               not               ah
+
+     positive:                                                                 ; Si el numero es positivo
                                mov               al, tempNum
                                mov               x, ax
                                
