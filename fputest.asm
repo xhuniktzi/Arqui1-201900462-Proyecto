@@ -17,12 +17,12 @@ endm
 
     integer  dw 0
 
-    count    dw 0
-
     config   dw 0C3Fh
 
              
 .code
+
+
 printFloat proc
                    fld        num
                    frndint
@@ -35,8 +35,8 @@ printFloat proc
                    fld        num
                    fisub      integer
                    fstp       num
-
-                   mov        count, 3
+    
+                   mov        cx, 4
 
     printFloatLoop:
 
@@ -46,16 +46,15 @@ printFloat proc
                    frndint
                    fistp      integer
                    mov        ax, integer
+                   push       cx
                    call       printInt
+                   pop        cx
 
                    fld        num
                    fisub      integer
                    fstp       num
-                   
-                   dec        count
-                   cmp        count, 0
-                   ja         printFloatLoop
 
+                   loop       printFloatLoop
     
                    ret
 
