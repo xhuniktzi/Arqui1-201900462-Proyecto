@@ -115,11 +115,16 @@ endm
 '9. Metodo de Steffenson',10,13,
 '$'
 
+     
+
      ;-----------------------------------------------------------------
      ; Texto de las opciones
      ;-----------------------------------------------------------------
 
      txt1             db 'Ingrese la ecuacion:', 10,13, '$'
+
+     ; quad             dw 3
+
      txt2             db 'Imprimir la funcion:', 10,13, '$'
      txt3             db 'Imprimir derivada:', 10,13, '$'
      txt4             db 'Imprimir Integral:', 10,13, '$'
@@ -692,6 +697,10 @@ displayCartesiano endp
      ; Main
      ; ------------------------------------------------
 main proc
+
+     ;  mov               quad, ax
+                              
+
                                mov               ax, @data
                                mov               ds, ax
      ;----------------
