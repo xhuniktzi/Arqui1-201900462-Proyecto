@@ -677,6 +677,14 @@ drawPixel3 proc
                                int               10h
                                ret
 drawPixel3 endp
+
+drawPixel4 proc
+     ; AL = color
+                               mov               ah,0ch
+                               mov               al,11
+                               int               10h
+                               ret
+drawPixel4 endp
      ; ------------------------------------------------
      ; Dibjuar Eje X
      ; ------------------------------------------------
@@ -686,7 +694,7 @@ drawXAxis proc
 
      drawXAxisLoop:            
                                inc               cx
-                               call              drawPixel
+                               call              drawPixel4
                                cmp               cx, 255
                                jne               drawXAxisLoop
                                ret
@@ -702,7 +710,7 @@ drawYAxis proc
 
      drawYAxisLoop:            
                                inc               dx
-                               call              drawPixel
+                               call              drawPixel4
                                cmp               dx, 255
                                jne               drawYAxisLoop
                                ret
