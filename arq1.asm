@@ -819,9 +819,9 @@ displayCartesiano proc
                                mov               ds,ax
      
      ; ---------------------------- Iniciar modo video ----------------------------
-     ;  mov               ah, 00h
-     ;  mov               al, 12h
-     ;  int               10h
+                               mov               ah, 00h
+                               mov               al, 12h
+                               int               10h
 
                                call              drawXAxis
                                call              drawYAxis
@@ -833,12 +833,6 @@ displayCartesiano proc
                                int               16h
                                
      ; ---------------------------- Finalizar modo video ----------------------------
-     ;  mov               ax, @data
-     ;  mov               ds, ax
-     ;  mov               ah, 0h
-     ;  mov               al, 07h
-     ;  int               10h
-
                                mov               ah, 00h
                                mov               al, 12h
                                int               10h
@@ -1095,6 +1089,8 @@ main proc
      ; Marcar que la ecuacion fue ingresada
                                mov               flagEcuacion, 1
                                call              convertCoefsToWord
+                               call              calculateDiffCoefs
+                               call              calculateIntegCoefs
 
                                jmp               menu
 
@@ -1149,7 +1145,7 @@ main proc
                                cmp               flagEcuacion, 0
                                je                noEcuacion
 
-                               call              calculateDiffCoefs
+                               
 
                                printCoefDiffWord coefADiff
                                printAscii        'x'
@@ -1187,7 +1183,7 @@ main proc
                                cmp               flagEcuacion, 0
                                je                noEcuacion
                            
-                               call              calculateIntegCoefs
+                               
                            
                                printCoef         coefAInteg
                                printAscii        'x'
