@@ -652,6 +652,14 @@ drawPixel proc
                                int               10h
                                ret
 drawPixel endp
+
+drawPixel2 proc
+     ; AL = color
+                               mov               ah,0ch
+                               mov               al,13
+                               int               10h
+                               ret
+drawPixel2 endp
      ; ------------------------------------------------
      ; Dibjuar Eje X
      ; ------------------------------------------------
@@ -741,9 +749,65 @@ drawFunc proc
                                sahf
                                jbe               drawFuncLoop
                                ret
-
-
 drawFunc endp
+
+drawDiff proc
+    
+     ;    inicializar variables
+                               fld               minX
+                               fstp              ptrCurrentX
+     drawDiffLoop:             
+     ; cargar valor de x
+                               fld               ptrCurrentX
+                               fstp              x
+                               call              calcDiff
+     ; multiplicar por 10
+                               fld               calc
+                               fimul             const_10
+
+     ; convertir a entero y guardar coordenada y
+                               fistp             tempDX
+                               mov               dx, tempDX
+
+     ; convertir a entero y guardar coordenada x
+                               fld               ptrCurrentX
+                               fimul             const_10
+                               fistp             tempCX
+                               mov               cx, tempCX
+
+     ; sumar 127 a la coordenada x
+                               add               cx, 127
+
+     ; sumar 127 a la coordenada y
+                               mov               dx, 127
+                               sub               dx, tempDX
+     ;  add               dx, 127
+                                   
+     ; verificar si la coordenada  esta dentro del rango
+                               cmp               cx, 0
+                               jl                drawDiffLoopEnd
+                               cmp               cx, 255
+                               jg                drawDiffLoopEnd
+                               cmp               dx, 0
+                               jl                drawDiffLoopEnd
+                               cmp               dx, 255
+                               jg                drawDiffLoopEnd
+     ; dibujar pixel
+                               call              drawPixel2
+     drawDiffLoopEnd:          
+     ; incrementar x
+                               fld               ptrCurrentX
+                               fadd              const_step
+                               fstp              ptrCurrentX
+     ; verificar si se llego al final
+                               fld               ptrCurrentX
+                               fcomp             maxX
+                               fnstsw            tempAX
+                               mov               ax, tempAX
+                               sahf
+                               jbe               drawDiffLoop
+                               ret
+drawDiff endp
 
 
      ; ------------------------------------------------
@@ -755,23 +819,28 @@ displayCartesiano proc
                                mov               ds,ax
      
      ; ---------------------------- Iniciar modo video ----------------------------
-                               mov               ah, 00h
-                               mov               al, 12h
-                               int               10h
+     ;  mov               ah, 00h
+     ;  mov               al, 12h
+     ;  int               10h
 
                                call              drawXAxis
                                call              drawYAxis
                                call              drawFunc
+                               call              drawDiff
 
      ; ---------------------------- Esperar tecla ----------------------------
                                mov               ah, 00h                       ; Leer caracter
                                int               16h
                                
      ; ---------------------------- Finalizar modo video ----------------------------
-                               mov               ax, @data
-                               mov               ds, ax
-                               mov               ah, 0h
-                               mov               al, 07h
+     ;  mov               ax, @data
+     ;  mov               ds, ax
+     ;  mov               ah, 0h
+     ;  mov               al, 07h
+     ;  int               10h
+
+                               mov               ah, 00h
+                               mov               al, 12h
                                int               10h
                                ret
 displayCartesiano endp
@@ -830,6 +899,48 @@ calcValue proc
 
                                ret
 calcValue endp
+
+calcDiff proc
+                   
+                               fldz
+                               fstp              calc
+     ; x^4
+                               fld               x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+
+                               fimul             coefADiff
+                               fadd              calc
+                               fstp              calc
+     ; x^3
+                               fld               x
+                               fmul              x
+                               fmul              x
+                   
+                               fimul             coefBDiff
+                               fadd              calc
+                               fstp              calc
+     ; x^2
+                               fld               x
+                               fmul              x
+                       
+                               fimul             coefCDiff
+                               fadd              calc
+                               fstp              calc
+     ; x^1
+                               fld               x
+                  
+                               fimul             coefDDiff
+                               fadd              calc
+                               fstp              calc
+     ; x^0
+                               fld               calc
+                               fiadd             coefEDiff
+                               fstp              calc
+
+                               ret
+calcDiff endp
 
 convertCoefsToWord proc
                                mov               ax, 0
@@ -901,6 +1012,10 @@ main proc
 
                                finit
                                fldcw             config
+
+                               mov               ah, 00h
+                               mov               al, 12h
+                               int               10h
 
      ;----------------
      ; Menu
@@ -1117,27 +1232,30 @@ main proc
                                jmp               exit
 
      opt6:                     
+                               mov               ah, 00h
+                               mov               al, 12h
+                               int               10h
      ; Mover cursor a (0,0) y limpiar pantalla
-                               mov               ah, 02h                       ; Función 02h: Mover cursor
-                               mov               bh, 00h                       ; Número de la pantalla (0: pantalla principal)
-                               mov               dh, 00h                       ; Coordenada Y del cursor (fila)
-                               mov               dl, 00h                       ; Coordenada X del cursor (columna)
-                               int               10h                           ; Llamada al sistema de video
+     ;                           mov               ah, 02h                       ; Función 02h: Mover cursor
+     ;                           mov               bh, 00h                       ; Número de la pantalla (0: pantalla principal)
+     ;                           mov               dh, 00h                       ; Coordenada Y del cursor (fila)
+     ;                           mov               dl, 00h                       ; Coordenada X del cursor (columna)
+     ;                           int               10h                           ; Llamada al sistema de video
 
-     ; Limpiar pantalla a partir de la posición actual del cursor
-                               mov               ah, 06h                       ; Función 06h: Scroll de pantalla hacia arriba
-                               mov               al, 00h                       ; Número de líneas a borrar (0: todas las líneas)
-                               mov               bh, 07h                       ; Atributo de color (blanco sobre fondo negro)
-                               mov               ch, 00h                       ; Coordenada Y de inicio (fila)
-                               mov               cl, 00h                       ; Coordenada X de inicio (columna)
-                               mov               dh, 24h                       ; Coordenada Y de fin (fila)
-                               mov               dl, 79h                       ; Coordenada X de fin (columna)
-                               int               10h                           ; Llamada al sistema de video
+     ; ; Limpiar pantalla a partir de la posición actual del cursor
+     ;                           mov               ah, 06h                       ; Función 06h: Scroll de pantalla hacia arriba
+     ;                           mov               al, 00h                       ; Número de líneas a borrar (0: todas las líneas)
+     ;                           mov               bh, 07h                       ; Atributo de color (blanco sobre fondo negro)
+     ;                           mov               ch, 00h                       ; Coordenada Y de inicio (fila)
+     ;                           mov               cl, 00h                       ; Coordenada X de inicio (columna)
+     ;                           mov               dh, 24h                       ; Coordenada Y de fin (fila)
+     ;                           mov               dl, 79h                       ; Coordenada X de fin (columna)
+     ;                           int               10h                           ; Llamada al sistema de video
                                jmp               menu
 
      opt7:                                                                     ; Cambia a modo de video gráfico
                                call              displayCartesiano
-                               jmp               opt6
+                               jmp               menu
      
 
 main endp
