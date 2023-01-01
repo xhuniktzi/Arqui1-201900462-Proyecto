@@ -260,6 +260,15 @@ endm
      tempBX           dw 0
      tempCX           dw 0
      tempDX           dw 0
+
+     ; ------------------------------------------------
+     ; Constantes
+     ; ------------------------------------------------
+     const_6          dw 6
+     const_5          dw 5
+     const_4          dw 4
+     const_3          dw 3
+     const_2          dw 2
      
 
 .code
@@ -660,6 +669,14 @@ drawPixel2 proc
                                int               10h
                                ret
 drawPixel2 endp
+
+drawPixel3 proc
+     ; AL = color
+                               mov               ah,0ch
+                               mov               al,14
+                               int               10h
+                               ret
+drawPixel3 endp
      ; ------------------------------------------------
      ; Dibjuar Eje X
      ; ------------------------------------------------
@@ -809,6 +826,63 @@ drawDiff proc
                                ret
 drawDiff endp
 
+drawInteg proc
+     ;    inicializar variables
+                               fld               minX
+                               fstp              ptrCurrentX
+     drawIntegLoop:            
+     ; cargar valor de x
+                               fld               ptrCurrentX
+                               fstp              x
+                               call              calcInteg
+     ; multiplicar por 10
+                               fld               calc
+                               fimul             const_10
+
+     ; convertir a entero y guardar coordenada y
+                               fistp             tempDX
+                               mov               dx, tempDX
+
+     ; convertir a entero y guardar coordenada x
+                               fld               ptrCurrentX
+                               fimul             const_10
+                               fistp             tempCX
+                               mov               cx, tempCX
+
+     ; sumar 127 a la coordenada x
+                               add               cx, 127
+
+     ; sumar 127 a la coordenada y
+                               mov               dx, 127
+                               sub               dx, tempDX
+     ;  add               dx, 127
+                                   
+     ; verificar si la coordenada  esta dentro del rango
+                               cmp               cx, 0
+                               jl                drawIntegLoopEnd
+                               cmp               cx, 255
+                               jg                drawIntegLoopEnd
+                               cmp               dx, 0
+                               jl                drawIntegLoopEnd
+                               cmp               dx, 255
+                               jg                drawIntegLoopEnd
+     ; dibujar pixel
+                               call              drawPixel3
+     drawIntegLoopEnd:         
+     ; incrementar x
+                               fld               ptrCurrentX
+                               fadd              const_step
+                               fstp              ptrCurrentX
+     ; verificar si se llego al final
+                               fld               ptrCurrentX
+                               fcomp             maxX
+                               fnstsw            tempAX
+                               mov               ax, tempAX
+                               sahf
+                               jbe               drawIntegLoop
+                               ret
+
+drawInteg endp
 
      ; ------------------------------------------------
      ; Dibujar plano cartesiano
@@ -827,6 +901,7 @@ displayCartesiano proc
                                call              drawYAxis
                                call              drawFunc
                                call              drawDiff
+                               call              drawInteg
 
      ; ---------------------------- Esperar tecla ----------------------------
                                mov               ah, 00h                       ; Leer caracter
@@ -894,6 +969,8 @@ calcValue proc
                                ret
 calcValue endp
 
+    
+
 calcDiff proc
                    
                                fldz
@@ -935,6 +1012,71 @@ calcDiff proc
 
                                ret
 calcDiff endp
+
+calcInteg proc
+
+                               fldz
+                               fstp              calc
+
+     ; x^6
+                               fld               x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+
+                               fimul             coefAWord
+                               fidiv             const_6
+                               fadd              calc
+                               fstp              calc
+     ; x^5
+                               fld               x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+
+                               fimul             coefBWord
+                               fidiv             const_5
+                               fadd              calc
+                               fstp              calc
+     ; x^4
+                               fld               x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+                   
+                               fimul             coefCWord
+                               fidiv             const_4
+                               fadd              calc
+                               fstp              calc
+     ; x^3
+                               fld               x
+                               fmul              x
+                               fmul              x
+                       
+                               fimul             coefDWord
+                               fidiv             const_3
+                               fadd              calc
+                               fstp              calc
+     ; x^2
+                               fld               x
+                               fmul              x
+                  
+                               fimul             coefEWord
+                               fidiv             const_2
+                               fadd              calc
+                               fstp              calc
+     ; x^1
+                               fld               x
+                   
+                               fimul             coefFWord
+                               fadd              calc
+                               fstp              calc
+
+                               ret
+calcInteg endp
 
 convertCoefsToWord proc
                                mov               ax, 0
