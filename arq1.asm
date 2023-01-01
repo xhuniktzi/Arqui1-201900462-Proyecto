@@ -224,20 +224,43 @@ endm
      ; Flag que almacenara el estado de la ecuacion
      ; ------------------------------------------------
      flagEcuacion     db 0                                                ; 0 = no ingresada, 1 = ingresada
+
+     ; ------------------------------------------------
+     ; Calcular funcion
+     ; ------------------------------------------------
      
+     coefAWord        dw 0
+     coefBWord        dw 0
+     coefCWord        dw 0
+     coefDWord        dw 0
+     coefEWord        dw 0
+     coefFWord        dw 0
 
-     ; ; ------------------------------------------------
-     ; ; Potencia variables temporales
-     ; ; ------------------------------------------------
-     ; base             dw 0                                                ; Variable donde se guarda la base
-     ; exponente        dw 0                                                ; Variable donde se guarda el exponente
-     ; resultado        dw 0                                                ; Variable donde se guarda el resultado
+     calc             dq 0
+     x                dq 0
 
-     ; ; ------------------------------------------------
-     ; ; Variables temporales para calculo de Y Pos
-     ; ; ------------------------------------------------
-     ; x                dw 0                                                ; Variable donde se guarda el valor de X
-     ; y                dw 0                                                ; Variable donde se guarda el valor de Y
+     ; ------------------------------------------------
+     ; FPU CONFIG
+     ; ------------------------------------------------
+     config           dw 0C3Fh
+
+     ; ------------------------------------------------
+     ; Dibujar funcion
+     ; ------------------------------------------------
+     minX             dq -12.6
+     ptrCurrentX      dq minX
+     maxX             dq 12.6
+     const_10         dw 10
+     const_step       dq 0.1
+
+     ; ------------------------------------------------
+     ; Temporal register
+     ; ------------------------------------------------
+     tempAX           dw 0
+     tempBX           dw 0
+     tempCX           dw 0
+     tempDX           dw 0
+     
 
 .code
      ; ------------------------------------------------
@@ -662,6 +685,64 @@ drawYAxis proc
 drawYAxis endp
 
 
+drawFunc proc
+
+     ;    inicializar variables
+                               fld               minX
+                               fstp              ptrCurrentX
+     drawFuncLoop:             
+     ; cargar valor de x
+                               fld               ptrCurrentX
+                               fstp              x
+                               call              calcValue
+     ; multiplicar por 10
+                               fld               calc
+                               fimul             const_10
+
+     ; convertir a entero y guardar coordenada y
+                               fistp             tempDX
+                               mov               dx, tempDX
+
+     ; convertir a entero y guardar coordenada x
+                               fld               ptrCurrentX
+                               fimul             const_10
+                               fistp             tempCX
+                               mov               cx, tempCX
+
+     ; sumar 127 a la coordenada x
+                               add               cx, 127
+
+     ; sumar 127 a la coordenada y
+                               add               dx, 127
+                                   
+     ; verificar si la coordenada  esta dentro del rango
+                               cmp               cx, 0
+                               jl                drawFuncLoopEnd
+                               cmp               cx, 255
+                               jg                drawFuncLoopEnd
+                               cmp               dx, 0
+                               jl                drawFuncLoopEnd
+                               cmp               dx, 255
+                               jg                drawFuncLoopEnd
+     ; dibujar pixel
+                               call              drawPixel
+     drawFuncLoopEnd:          
+     ; incrementar x
+                               fld               ptrCurrentX
+                               fadd              const_step
+                               fstp              ptrCurrentX
+     ; verificar si se llego al final
+                               fld               ptrCurrentX
+                               fcomp             maxX
+                               fnstsw            tempAX
+                               mov               ax, tempAX
+                               sahf
+                               jbe               drawFuncLoop
+                               ret
+
+
+drawFunc endp
+
 
      ; ------------------------------------------------
      ; Dibujar plano cartesiano
@@ -678,6 +759,7 @@ displayCartesiano proc
 
                                call              drawXAxis
                                call              drawYAxis
+                               call              drawFunc
 
      ; ---------------------------- Esperar tecla ----------------------------
                                mov               ah, 00h                       ; Leer caracter
@@ -692,17 +774,132 @@ displayCartesiano proc
                                ret
 displayCartesiano endp
 
+     ; ------------------------------------------------
+     ; Calcular valor de la función en el punto x
+     ; ------------------------------------------------
+calcValue proc
+                   
+                               fldz
+                               fstp              calc
+     ; x^5
+                               fld               x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+
+                               fimul             coefAWord
+                               fadd              calc
+                               fstp              calc
+     ; x^4
+                               fld               x
+                               fmul              x
+                               fmul              x
+                               fmul              x
+                   
+                               fimul             coefBWord
+                               fadd              calc
+                               fstp              calc
+     ; x^3
+                               fld               x
+                               fmul              x
+                               fmul              x
+                       
+                               fimul             coefCWord
+                               fadd              calc
+                               fstp              calc
+     ; x^2
+                               fld               x
+                               fmul              x
+                  
+                               fimul             coefDWord
+                               fadd              calc
+                               fstp              calc
+     ; x^1
+                               fld               x
+                   
+                               fimul             coefEWord
+                               fadd              calc
+                               fstp              calc
+     ; x^0
+                               fld               calc
+                               fiadd             coefFWord
+                               fstp              calc
+
+                               ret
+calcValue endp
+
+convertCoefsToWord proc
+                               mov               ax, 0
+                               mov               al, coefA
+
+                               cmp               al, 0
+                               jge               convertAPos
+                               not               ah
+     convertAPos:              
+                               mov               coefAWord, ax
+
+                               mov               ax, 0
+                               mov               al, coefB
+
+                               cmp               al, 0
+                               jge               convertBPos
+                               not               ah
+     convertBPos:              
+
+                               mov               coefBWord, ax
+
+                               mov               ax, 0
+                               mov               al, coefC
+
+                               cmp               al, 0
+                               jge               convertCPos
+                               not               ah
+     convertCPos:              
+                               mov               coefCWord, ax
+
+                               mov               ax, 0
+                               mov               al, coefD
+
+                               cmp               al, 0
+                               jge               convertDPos
+                               not               ah
+     convertDPos:              
+
+                               mov               coefDWord, ax
+
+                               mov               ax, 0
+                               mov               al, coefE
+
+                               cmp               al, 0
+                               jge               convertEPos
+                               not               ah
+     convertEPos:              
+
+                               mov               coefEWord, ax
+
+                               mov               ax, 0
+                               mov               al, coefF
+
+                               cmp               al, 0
+                               jge               convertFPos
+                               not               ah
+     convertFPos:              
+
+                               mov               coefFWord, ax
+                               ret
+convertCoefsToWord endp
 
      ; ------------------------------------------------
      ; Main
      ; ------------------------------------------------
 main proc
-
-     ;  mov               quad, ax
-                              
-
                                mov               ax, @data
                                mov               ds, ax
+
+                               finit
+                               fldcw             config
+
      ;----------------
      ; Menu
      ;----------------
@@ -780,6 +977,7 @@ main proc
 
      ; Marcar que la ecuacion fue ingresada
                                mov               flagEcuacion, 1
+                               call              convertCoefsToWord
 
                                jmp               menu
 
