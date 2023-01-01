@@ -257,9 +257,9 @@ endm
      ; ------------------------------------------------
      ; Dibujar funcion
      ; ------------------------------------------------
-     minX             dq -39.9
+     minX             dq -47.9
      ptrCurrentX      dq minX
-     maxX             dq 39.9
+     maxX             dq 47.9
      const_10         dw 10
      const_step       dq 0.1
 
@@ -699,13 +699,13 @@ drawPixel4 endp
      ; Dibjuar Eje X
      ; ------------------------------------------------
 drawXAxis proc
-                               mov               dx, 200                       ; Set Coordenada Y
+                               mov               dx, 239                       ; Set Coordenada Y
                                mov               cx, 0                         ; Set Coordenada X
 
      drawXAxisLoop:            
                                inc               cx
                                call              drawPixel4
-                               cmp               cx, 400
+                               cmp               cx, 479
                                jne               drawXAxisLoop
                                ret
 
@@ -716,12 +716,12 @@ drawXAxis endp
      ; ------------------------------------------------
 drawYAxis proc
                                mov               dx, 0                         ; Set Coordenada Y
-                               mov               cx, 200                       ; Set Coordenada X
+                               mov               cx, 239                       ; Set Coordenada X
 
      drawYAxisLoop:            
                                inc               dx
                                call              drawPixel4
-                               cmp               dx, 400
+                               cmp               dx, 479
                                jne               drawYAxisLoop
                                ret
 
@@ -753,21 +753,21 @@ drawFunc proc
                                mov               cx, tempCX
 
      ; sumar 127 a la coordenada x
-                               add               cx, 200
+                               add               cx, 239
 
      ; sumar 127 a la coordenada y
-                               mov               dx, 200
+                               mov               dx, 239
                                sub               dx, tempDX
      ;  add               dx, 127
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
                                jl                drawFuncLoopEnd
-                               cmp               cx, 400
+                               cmp               cx, 479
                                jg                drawFuncLoopEnd
                                cmp               dx, 0
                                jl                drawFuncLoopEnd
-                               cmp               dx, 400
+                               cmp               dx, 479
                                jg                drawFuncLoopEnd
      ; dibujar pixel
                                call              drawPixel
@@ -811,21 +811,21 @@ drawDiff proc
                                mov               cx, tempCX
 
      ; sumar 127 a la coordenada x
-                               add               cx, 200
+                               add               cx, 239
 
      ; sumar 127 a la coordenada y
-                               mov               dx, 200
+                               mov               dx, 239
                                sub               dx, tempDX
      ;  add               dx, 127
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
                                jl                drawDiffLoopEnd
-                               cmp               cx, 400
+                               cmp               cx, 479
                                jg                drawDiffLoopEnd
                                cmp               dx, 0
                                jl                drawDiffLoopEnd
-                               cmp               dx, 400
+                               cmp               dx, 479
                                jg                drawDiffLoopEnd
      ; dibujar pixel
                                call              drawPixel2
@@ -868,21 +868,21 @@ drawInteg proc
                                mov               cx, tempCX
 
      ; sumar 127 a la coordenada x
-                               add               cx, 200
+                               add               cx, 239
 
      ; sumar 127 a la coordenada y
-                               mov               dx, 200
+                               mov               dx, 239
                                sub               dx, tempDX
      ;  add               dx, 127
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
                                jl                drawIntegLoopEnd
-                               cmp               cx, 400
+                               cmp               cx, 479
                                jg                drawIntegLoopEnd
                                cmp               dx, 0
                                jl                drawIntegLoopEnd
-                               cmp               dx, 400
+                               cmp               dx, 479
                                jg                drawIntegLoopEnd
      ; dibujar pixel
                                call              drawPixel3
