@@ -713,7 +713,9 @@ drawFunc proc
                                add               cx, 127
 
      ; sumar 127 a la coordenada y
-                               add               dx, 127
+                               mov               dx, 127
+                               sub               dx, tempDX
+     ;  add               dx, 127
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
