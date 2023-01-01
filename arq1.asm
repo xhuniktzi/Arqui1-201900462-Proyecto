@@ -141,6 +141,16 @@ endm
      txtCoefF         db 'Ingrese el coeficiente f: f', 10,13, '$'
 
      ; ------------------------------------------------
+     ; texto de solicitud de grafica
+     ; ------------------------------------------------
+     txtGrafica       db 'Grafica: ', 10,13,
+'1. Graficar funcion', 10,13,
+'2. Graficar derivada', 10,13,
+'3. Graficar integral', 10,13,
+'4. Graficar todas', 10,13,
+'5. Salir', 10, 13, '$'
+
+     ; ------------------------------------------------
      ; Mostrar la funcion
      ; ------------------------------------------------
      txtFunc          db 'La funcion es: ', 10,13, '$'
@@ -247,9 +257,9 @@ endm
      ; ------------------------------------------------
      ; Dibujar funcion
      ; ------------------------------------------------
-     minX             dq -12.6
+     minX             dq -39.9
      ptrCurrentX      dq minX
-     maxX             dq 12.6
+     maxX             dq 39.9
      const_10         dw 10
      const_step       dq 0.1
 
@@ -689,13 +699,13 @@ drawPixel4 endp
      ; Dibjuar Eje X
      ; ------------------------------------------------
 drawXAxis proc
-                               mov               dx, 127                       ; Set Coordenada Y
+                               mov               dx, 200                       ; Set Coordenada Y
                                mov               cx, 0                         ; Set Coordenada X
 
      drawXAxisLoop:            
                                inc               cx
                                call              drawPixel4
-                               cmp               cx, 255
+                               cmp               cx, 400
                                jne               drawXAxisLoop
                                ret
 
@@ -706,12 +716,12 @@ drawXAxis endp
      ; ------------------------------------------------
 drawYAxis proc
                                mov               dx, 0                         ; Set Coordenada Y
-                               mov               cx, 127                       ; Set Coordenada X
+                               mov               cx, 200                       ; Set Coordenada X
 
      drawYAxisLoop:            
                                inc               dx
                                call              drawPixel4
-                               cmp               dx, 255
+                               cmp               dx, 400
                                jne               drawYAxisLoop
                                ret
 
@@ -743,21 +753,21 @@ drawFunc proc
                                mov               cx, tempCX
 
      ; sumar 127 a la coordenada x
-                               add               cx, 127
+                               add               cx, 200
 
      ; sumar 127 a la coordenada y
-                               mov               dx, 127
+                               mov               dx, 200
                                sub               dx, tempDX
      ;  add               dx, 127
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
                                jl                drawFuncLoopEnd
-                               cmp               cx, 255
+                               cmp               cx, 400
                                jg                drawFuncLoopEnd
                                cmp               dx, 0
                                jl                drawFuncLoopEnd
-                               cmp               dx, 255
+                               cmp               dx, 400
                                jg                drawFuncLoopEnd
      ; dibujar pixel
                                call              drawPixel
@@ -801,21 +811,21 @@ drawDiff proc
                                mov               cx, tempCX
 
      ; sumar 127 a la coordenada x
-                               add               cx, 127
+                               add               cx, 200
 
      ; sumar 127 a la coordenada y
-                               mov               dx, 127
+                               mov               dx, 200
                                sub               dx, tempDX
      ;  add               dx, 127
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
                                jl                drawDiffLoopEnd
-                               cmp               cx, 255
+                               cmp               cx, 400
                                jg                drawDiffLoopEnd
                                cmp               dx, 0
                                jl                drawDiffLoopEnd
-                               cmp               dx, 255
+                               cmp               dx, 400
                                jg                drawDiffLoopEnd
      ; dibujar pixel
                                call              drawPixel2
@@ -858,21 +868,21 @@ drawInteg proc
                                mov               cx, tempCX
 
      ; sumar 127 a la coordenada x
-                               add               cx, 127
+                               add               cx, 200
 
      ; sumar 127 a la coordenada y
-                               mov               dx, 127
+                               mov               dx, 200
                                sub               dx, tempDX
      ;  add               dx, 127
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
                                jl                drawIntegLoopEnd
-                               cmp               cx, 255
+                               cmp               cx, 400
                                jg                drawIntegLoopEnd
                                cmp               dx, 0
                                jl                drawIntegLoopEnd
-                               cmp               dx, 255
+                               cmp               dx, 400
                                jg                drawIntegLoopEnd
      ; dibujar pixel
                                call              drawPixel3
@@ -900,7 +910,89 @@ displayCartesiano proc
                                mov               ax,@data
                                mov               ds,ax
      
+
+
+     ; ---------------------------- Seleccionar grafica ----------------------------
+
+     menuGrafica:              
      ; ---------------------------- Iniciar modo video ----------------------------
+                               mov               ah, 00h
+                               mov               al, 12h
+                               int               10h
+
+                               printMsg          txtGrafica
+
+                               mov               ah, 00h                       ; Leer caracter
+                               int               16h
+
+                               cmp               al, 27                        ; ESC
+                               je                graphOpt5
+
+                               cmp               al, '1'
+                               je                graphOpt1
+
+                               cmp               al, '2'
+                               je                graphOpt2
+    
+                               cmp               al, '3'
+                               je                graphOpt3
+
+                               cmp               al, '4'
+                               je                graphOpt4
+
+                               cmp               al, '5'
+                               je                graphOpt5
+
+                               jmp               menuGrafica
+
+     ; ---------------------------- Grafica 1 ----------------------------
+     graphOpt1:                
+                               mov               ah, 00h
+                               mov               al, 12h
+                               int               10h
+
+                               call              drawXAxis
+                               call              drawYAxis
+                               call              drawFunc
+
+
+                               mov               ah, 00h                       ; Leer caracter
+                               int               16h
+
+                               jmp               menuGrafica
+
+     ; ---------------------------- Grafica 2 ----------------------------
+     graphOpt2:                
+                               mov               ah, 00h
+                               mov               al, 12h
+                               int               10h
+
+                               call              drawXAxis
+                               call              drawYAxis
+                               call              drawDiff
+
+                               mov               ah, 00h                       ; Leer caracter
+                               int               16h
+
+                               jmp               menuGrafica
+
+     ; ---------------------------- Grafica 3 ----------------------------
+     graphOpt3:                
+                               mov               ah, 00h
+                               mov               al, 12h
+                               int               10h
+
+                               call              drawXAxis
+                               call              drawYAxis
+                               call              drawInteg
+
+                               mov               ah, 00h                       ; Leer caracter
+                               int               16h
+
+                               jmp               menuGrafica
+
+     ; ---------------------------- Grafica 4 ----------------------------
+     graphOpt4:                
                                mov               ah, 00h
                                mov               al, 12h
                                int               10h
@@ -911,11 +1003,13 @@ displayCartesiano proc
                                call              drawDiff
                                call              drawInteg
 
-     ; ---------------------------- Esperar tecla ----------------------------
                                mov               ah, 00h                       ; Leer caracter
                                int               16h
+
+                               jmp               menuGrafica
                                
      ; ---------------------------- Finalizar modo video ----------------------------
+     graphOpt5:                
                                mov               ah, 00h
                                mov               al, 12h
                                int               10h
