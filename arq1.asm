@@ -663,6 +663,7 @@ calculateIntegCoefs endp
 
      ; ------------------------------------------------
      ; drawPixel
+     ; Dibuja un pixel en la coordenada enviada en dx y cx
      ; ------------------------------------------------
 drawPixel proc
      ; AL = color
@@ -727,7 +728,18 @@ drawYAxis proc
 
 drawYAxis endp
 
-
+     ; ------------------------------------------------
+     ; Este código contiene dos procedimientos, drawFunc y drawDiff, que dibujan líneas en una pantalla de 640x480
+     ; pixeles.
+     ; Ambos procedimientos tienen un ciclo que se repite hasta que se llega al final del rango de valores de X que se
+     ; están dibujando. En cada iteración del ciclo, se llama a una función calcValue o calcDiff para calcular el valor
+     ; de Y para el valor actual de X. Luego, se multiplica este valor por 10 y se convierte a entero.
+     ; Luego, se añade el valor de 239 a la coordenada X y se resta este valor a la coordenada Y, y se verifica si
+     ; están dentro del rango de la pantalla (entre 0 y 479). Si están dentro del rango, se llama a una función
+     ; drawPixel para dibujar el pixel en la pantalla.
+     ; Finalmente, se aumenta el valor de X en una cantidad fija (const_step) y se verifica si se ha llegado al final
+     ; del rango. Si se ha llegado al final, se sale del ciclo y se finaliza el procedimiento.
+     ; ------------------------------------------------
 drawFunc proc
 
      ;    inicializar variables
@@ -752,13 +764,13 @@ drawFunc proc
                                fistp             tempCX
                                mov               cx, tempCX
 
-     ; sumar 127 a la coordenada x
+     ; sumar 239 a la coordenada x
                                add               cx, 239
 
-     ; sumar 127 a la coordenada y
+     ; sumar 239 a la coordenada y
                                mov               dx, 239
                                sub               dx, tempDX
-     ;  add               dx, 127
+     ;  add               dx, 239
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
@@ -810,13 +822,13 @@ drawDiff proc
                                fistp             tempCX
                                mov               cx, tempCX
 
-     ; sumar 127 a la coordenada x
+     ; sumar 239 a la coordenada x
                                add               cx, 239
 
-     ; sumar 127 a la coordenada y
+     ; sumar 239 a la coordenada y
                                mov               dx, 239
                                sub               dx, tempDX
-     ;  add               dx, 127
+     ;  add               dx, 239
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
@@ -867,13 +879,13 @@ drawInteg proc
                                fistp             tempCX
                                mov               cx, tempCX
 
-     ; sumar 127 a la coordenada x
+     ; sumar 239 a la coordenada x
                                add               cx, 239
 
-     ; sumar 127 a la coordenada y
+     ; sumar 239 a la coordenada y
                                mov               dx, 239
                                sub               dx, tempDX
-     ;  add               dx, 127
+     ;  add               dx, 239
                                    
      ; verificar si la coordenada  esta dentro del rango
                                cmp               cx, 0
@@ -904,6 +916,14 @@ drawInteg endp
 
      ; ------------------------------------------------
      ; Dibujar plano cartesiano
+     ; Este código es un programa que muestra un menú para seleccionar entre diferentes opciones de gráficas a dibujar.
+     ; El programa comienza inicializando algunas variables y luego entra en un ciclo que muestra un menú y lee la
+     ; opción seleccionada por el usuario. Si el usuario selecciona la opción de salir (presionando la tecla 'ESC'), el
+     ; programa termina. De lo contrario, se verifica qué opción de gráfica se ha seleccionado y se llaman a las
+     ; funciones necesarias para dibujar la gráfica correspondiente.
+     ; Las opciones de gráficas incluyen dibujar el eje X y Y, y luego llamar a una de las cuatro funciones drawFunc,
+     ; drawDiff, drawInteg. Después de dibujar la gráfica, se vuelve al menú para que el usuario pueda
+     ; seleccionar otra opción.
      ; ------------------------------------------------
 displayCartesiano proc
 
@@ -1018,6 +1038,18 @@ displayCartesiano endp
 
      ; ------------------------------------------------
      ; Calcular valor de la función en el punto x
+     ; Este código contiene tres procedimientos, calcValue, calcDiff, y calcInteg, que se utilizan para calcular el
+     ; valor de una función, su derivada y su integral, respectivamente, en un punto dado. Cada procedimiento toma una
+     ; variable de entrada x y almacena el resultado en una variable calc.
+     ; El procedimiento calcValue calcula el valor de una función de segundo grado utilizando la siguiente fórmula:
+     ; f(x) = Ax^5 + Bx^4 + Cx^3 + Dx^2 + Ex + F
+     ; El procedimiento calcDiff calcula la derivada de la misma función utilizando la siguiente fórmula:
+     ; f'(x) = 5Ax^4 + 4Bx^3 + 3Cx^2 + 2Dx + E
+     ; El procedimiento calcInteg calcula la integral de la misma función utilizando la siguiente fórmula:
+     ; ∫f(x) dx = Ax^6/6 + Bx^5/5 + Cx^4/4 + Dx^3/3 + Ex^2/2 + Fx + C
+     ; Cada uno de estos procedimientos realiza una serie de operaciones aritméticas para calcular el valor deseado
+     ; utilizando la fórmula correspondiente. Al final de cada procedimiento, se almacena el resultado en la variable
+     ; calc.
      ; ------------------------------------------------
 calcValue proc
                    
@@ -1180,6 +1212,17 @@ calcInteg proc
                                ret
 calcInteg endp
 
+     ; ------------------------------------------------
+     ; Este código contiene un procedimiento que convierte los coeficientes de una ecuación de segundo grado a palabras
+     ; de 16 bits.
+     ; La ecuación de segundo grado tiene la forma Ax^2 + Bx + C. Los coeficientes A, B, y C se almacenan en variables
+     ; coefA, coefB, y coefC, respectivamente. El procedimiento convierte cada uno de estos coeficientes a una palabra
+     ; de 16 bits y los almacena en variables coefAWord, coefBWord, y coefCWord, respectivamente.
+     ; Antes de convertir cada coeficiente, se verifica si es negativo o no. Si es negativo, se utiliza una instrucción
+     ; not para invertir todos los bits del número y luego se aumenta en uno para obtener el número negativo
+     ; correspondiente. Luego, se almacena el número en la variable de destino. Este proceso se repite para cada uno de
+     ; los coeficientes.
+     ; ------------------------------------------------
 convertCoefsToWord proc
                                mov               ax, 0
                                mov               al, coefA
